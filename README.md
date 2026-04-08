@@ -28,3 +28,6 @@ poetry run pytest --cov=src --cov-report=term
 
 ### Автор
 Владимир
+
+## Сдача проекта
+Проект готов к проверке.
