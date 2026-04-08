@@ -1,0 +1,55 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+ENV/
+
+# PyCharm (и другие IDE)
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Кеш Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Тесты и покрытие
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.temp
+
+# Файлы с секретами
+.env
+.env.local
+*.key
+*.pem
+
+# Директории сборки
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Файлы отчетов
+*.xml
+*.html
+*.junit
+
+# Poetry
+# poetry.lock
