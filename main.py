@@ -1,56 +1,53 @@
 from src.category import Category
-from src.json_loader import load_categories_from_json
 from src.product import Product
 
-
-def demo_manual_creation():
-    """Демонстрация ручного создания объектов"""
-    print("=" * 50)
-    print("Ручное создание объектов")
-    print("=" * 50)
-
+if __name__ == "__main__":
+    # Создаём продукты
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
-    category = Category(
+    # Создаём категорию с продуктами
+    category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных " "функций для удобства жизни",
         [product1, product2, product3],
     )
 
-    print(f"Категория: {category.name}")
-    print(f"Товаров в категории: {len(category.products)}")
-    for product in category.products:
-        print(f"  - {product.name}: {product.price} ₽")
+    # Выводим список продуктов в категории
+    print("Продукты в категории:", category1.products)
 
+    # Создаём новый продукт и добавляем его в категорию
+    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
+    category1.add_product(product4)
 
-def demo_json_loading():
-    """Демонстрация загрузки из JSON"""
-    print("\n" + "=" * 50)
-    print("Загрузка из JSON файла")
-    print("=" * 50)
+    # Выводим обновлённый список продуктов и количество товаров
+    print("Продукты после добавления:", category1.products)
+    print("Количество товаров в категории:", category1.product_count)
 
-    categories = load_categories_from_json("products.json")
+    # Создаём продукт через класс-метод new_product из словаря
+    new_product = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 180000.0,
+            "quantity": 5,
+        }
+    )
 
-    print(f"Всего загружено категорий: {len(categories)}")
-    print(f"Всего категорий в системе (атрибут класса): {Category.category_count}")
-    print(f"Всего товаров в системе (атрибут класса): {Category.product_count}")
-    print()
+    print(new_product.name)
+    print(new_product.description)
+    print(new_product.price)
+    print(new_product.quantity)
 
-    for category in categories:
-        print(f"📁 Категория: {category.name}")
-        print(f"   Описание: {category.description}")
-        print(f"   Товары ({len(category.products)}):")
-        for product in category.products:
-            print(f"     📦 {product.name} | {product.price} ₽ | {product.quantity} шт.")
-        print()
+    # Меняем цену через сеттер (корректное значение)
+    new_product.price = 800
+    print("Цена после установки 800:", new_product.price)
 
+    # Пытаемся установить некорректную цену (отрицательную)
+    new_product.price = -100
+    print("Цена после попытки установить -100:", new_product.price)
 
-if __name__ == "__main__":
-    # Сброс счетчиков для чистоты демонстрации (только для показа)
-    Category.category_count = 0
-    Category.product_count = 0
-
-    demo_manual_creation()
-    demo_json_loading()
+    # Пытаемся установить некорректную цену (ноль)
+    new_product.price = 0
+    print("Цена после попытки установить 0:", new_product.price)

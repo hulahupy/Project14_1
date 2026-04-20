@@ -14,3 +14,8 @@ class Category:
 
         Category.category_count += 1
         Category.product_count += len(products)
+
+    def add_product(self, product: Product) -> None:
+        """Добавляет продукт в категорию и обновляет счётчик"""
+        self.products.append(product)
+        Category.product_count += 1
