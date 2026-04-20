@@ -26,8 +26,10 @@ class TestJsonLoader:
 
         assert len(categories) == 1
         assert categories[0].name == "Тестовая категория"
-        assert len(categories[0].products) == 1
-        assert categories[0].products[0].name == "Тестовый товар"
+        # Геттер products теперь возвращает строку, а не список
+        assert "Тестовый товар" in categories[0].products
+        assert "1000.0 руб." in categories[0].products
+        assert "Остаток: 10 шт." in categories[0].products
 
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):

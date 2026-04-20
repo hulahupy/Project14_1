@@ -6,15 +6,6 @@ from src.product import Product
 
 
 def load_categories_from_json(file_path: str) -> list[Category]:
-    """
-    Загружает категории и товары из JSON файла.
-
-    Args:
-        file_path: Путь к JSON файлу
-
-    Returns:
-        Список объектов Category
-    """
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Файл {file_path} не найден")
 

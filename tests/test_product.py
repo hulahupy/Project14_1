@@ -27,6 +27,29 @@ class TestProduct:
         assert product.price == 25000.0
         assert product.quantity == 7
 
+    def test_new_product_with_duplicate(self):
+        """Тест: при дубликате товара количество суммируется, цена выбирается максимальная"""
+        existing_product = Product("Телефон", "Описание", 1000.0, 5)
+        existing_products = [existing_product]
+
+        new_product_data = {"name": "Телефон", "description": "Новое описание", "price": 1200.0, "quantity": 3}
+
+        result = Product.new_product(new_product_data, existing_products)
+        assert result is existing_product
+        assert result.quantity == 8
+        assert result.price == 1200.0
+
+    def test_new_product_with_duplicate_lower_price(self):
+        """Тест: при дубликате с меньшей ценой — цена остаётся старой"""
+        existing_product = Product("Телефон", "Описание", 1500.0, 5)
+        existing_products = [existing_product]
+
+        new_product_data = {"name": "Телефон", "description": "Новое описание", "price": 1200.0, "quantity": 3}
+
+        result = Product.new_product(new_product_data, existing_products)
+        assert result.quantity == 8
+        assert result.price == 1500.0  # Цена не изменилась, так как была выше
+
     def test_price_setter_valid(self):
         product = Product("Товар", "Описание", 100.0, 5)
         product.price = 200.0
@@ -36,10 +59,26 @@ class TestProduct:
         product = Product("Товар", "Описание", 100.0, 5)
         product.price = -50
         captured = capsys.readouterr()
-        assert "Цена не может быть отрицательной или нулевой" in captured.out
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
         assert product.price == 100.0
 
         product.price = 0
         captured = capsys.readouterr()
-        assert "Цена не может быть отрицательной или нулевой" in captured.out
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
         assert product.price == 100.0
+
+    def test_price_setter_decrease_confirmation(self, monkeypatch, capsys):
+        """Тест: при понижении цены запрашивается подтверждение"""
+        product = Product("Товар", "Описание", 100.0, 5)
+
+        # Симулируем ввод 'y'
+        monkeypatch.setattr("builtins.input", lambda _: "y")
+        product.price = 80.0
+        assert product.price == 80.0
+
+        # Симулируем ввод 'n'
+        monkeypatch.setattr("builtins.input", lambda _: "n")
+        product.price = 60.0
+        assert product.price == 80.0  # Не изменилась
+        captured = capsys.readouterr()
+        assert "Изменение цены отменено" in captured.out

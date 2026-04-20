@@ -1,3 +1,5 @@
+import pytest
+
 from src.category import Category
 from src.product import Product
 
@@ -14,8 +16,8 @@ class TestCategory:
         category = Category("Электроника", "Разные электронные устройства", self.products)
         assert category.name == "Электроника"
         assert category.description == "Разные электронные устройства"
-        assert len(category.products) == 2
-        assert category.products[0] == self.product1
+        assert "Товар1" in category.products
+        assert "Товар2" in category.products
 
     def test_category_count_increments(self):
         initial_count = Category.category_count
@@ -34,6 +36,19 @@ class TestCategory:
 
         category.add_product(new_product)
 
-        assert len(category.products) == 1
-        assert category.products[0] == new_product
+        assert "Новый товар" in category.products
         assert Category.product_count == initial_product_count + 1
+
+    def test_products_getter_format(self):
+        category = Category("Электроника", "Описание", self.products)
+        expected = "Товар1, 100.0 руб. Остаток: 5 шт.\nТовар2, 200.0 руб. Остаток: 3 шт."
+        assert category.products == expected
+
+    def test_products_getter_empty(self):
+        category = Category("Пустая", "Описание", [])
+        assert category.products == ""
+
+    def test_products_private_attribute(self):
+        category = Category("Электроника", "Описание", self.products)
+        with pytest.raises(AttributeError):
+            _ = category.__products
