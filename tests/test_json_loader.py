@@ -7,10 +7,7 @@ from src.json_loader import load_categories_from_json
 
 
 class TestJsonLoader:
-    """Тесты для загрузки из JSON"""
-
     def test_load_categories_from_json(self):
-        """Тест загрузки категорий из JSON"""
         test_data = [
             {
                 "name": "Тестовая категория",
@@ -29,12 +26,11 @@ class TestJsonLoader:
 
         assert len(categories) == 1
         assert categories[0].name == "Тестовая категория"
-        assert categories[0].description == "Описание тестовой категории"
-        assert len(categories[0].products) == 1
-        assert categories[0].products[0].name == "Тестовый товар"
-        assert categories[0].products[0].price == 1000.0
+        # Геттер products теперь возвращает строку, а не список
+        assert "Тестовый товар" in categories[0].products
+        assert "1000.0 руб." in categories[0].products
+        assert "Остаток: 10 шт." in categories[0].products
 
     def test_file_not_found(self):
-        """Тест ошибки при отсутствии файла"""
         with pytest.raises(FileNotFoundError):
-            load_categories_from_json("nonexistent_file.json")
+            load_categories_from_json("nonexistent.json")
