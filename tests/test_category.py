@@ -1,3 +1,5 @@
+import pytest
+
 from src.category import Category
 from src.product import Product
 
@@ -18,7 +20,6 @@ class TestCategory:
         assert category.name == "Электроника"
         assert category.description == "Разные электронные устройства"
         assert len(category.products) == 2
-        # Проверяем, что товары в списке (по объектам, не по строкам)
         assert self.product1 in category.products
         assert self.product2 in category.products
 
@@ -37,7 +38,6 @@ class TestCategory:
     def test_products_getter_format(self):
         """Тест строкового представления продуктов категории"""
         category = Category("Электроника", "Описание", self.products)
-        # Проверяем, что products возвращает список объектов Product
         assert isinstance(category.products, list)
         assert len(category.products) == 2
         assert isinstance(category.products[0], Product)
@@ -50,5 +50,16 @@ class TestCategory:
     def test_products_private_attribute(self):
         """Тест, что продукты хранятся в приватном атрибуте"""
         category = Category("Тест", "Описание", self.products)
-        # Проверяем, что есть защищённый атрибут
         assert hasattr(category, "_Category__products")
+
+    def test_add_product_invalid_type(self):
+        """Тест: добавление не-продукта вызывает TypeError"""
+        category = Category("Тест", "Описание", [])
+        with pytest.raises(TypeError):
+            category.add_product("not a product")
+
+        with pytest.raises(TypeError):
+            category.add_product(123)
+
+        with pytest.raises(TypeError):
+            category.add_product(None)
