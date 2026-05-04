@@ -6,6 +6,18 @@
 
 ---
 
+## 📚 Оглавление
+- [Классы](#классы)
+- [Абстрактный класс BaseProduct](#абстрактный-класс-baseproduct)
+- [Миксин PrintInitMixin](#миксин-printinitmixin)
+- [Класс Order (дополнительное задание)](#класс-order-дополнительное-задание)
+- [Установка и запуск](#установка-и-запуск)
+- [Тестирование](#тестирование)
+- [Линтеры и форматирование](#линтеры-и-форматирование)
+- [Структура проекта](#структура-проекта)
+
+---
+
 ## Классы
 
 ### Product (базовый класс)
@@ -49,32 +61,58 @@
 
 ---
 
-## Новое в этой версии
+## Абстрактный класс BaseProduct
 
-### Классы-наследники Product
-- **Smartphone** - смартфоны с дополнительными характеристиками
-- **LawnGrass** - газонная трава с дополнительными характеристиками
+Базовый абстрактный класс для всех продуктов. Определяет обязательные методы:
 
-### Ограничения сложения
-- Складывать можно только товары **одного класса**
-- При попытке сложить разные классы (например, `Smartphone + LawnGrass`) выбрасывается `TypeError`
-- Для проверки используется функция `type()`
-
-### Безопасное добавление в категорию
-- Метод `add_product` проверяет, что добавляется объект `Product` или его наследник
-- При попытке добавить другой тип (строку, число и т.д.) выбрасывается `TypeError`
-- Для проверки используется функция `isinstance()`
-
----
-
-## Установка и запуск
-
-### Требования
-- Python 3.10+
-- Poetry
-
-### Установка зависимостей
 ```
+class BaseProduct(ABC):
+    @abstractmethod
+    def __str__(self) -> str: ...
+
+    @abstractmethod
+    def __add__(self, other: 'BaseProduct') -> float: ...
+Наследники: Product, Smartphone, LawnGrass
+
+Миксин PrintInitMixin
+Класс-миксин, который при создании объекта выводит в консоль информацию о создании.
+
+
+class PrintInitMixin:
+    @staticmethod
+    def print_init_info(instance, *args, **kwargs):
+        """Печать информации о создании объекта"""
+Пример вывода:
+
+
+Product('Телефон', 'Смартфон', 50000.0, 10)
+Smartphone('iPhone', 'Смартфон', 100000.0, 5, 95.5, '15 Pro', 256, 'Black')
+LawnGrass('Трава', 'Газонная', 500.0, 20, 'Россия', '7 дней', 'Зеленый')
+Класс Order (дополнительное задание)
+Представляет заказ на один товар.
+
+Базовый абстрактный класс BaseOrder
+
+class BaseOrder(ABC):
+    @abstractmethod
+    def total_price(self) -> float: ...
+Класс Order
+
+class Order(BaseOrder):
+    def __init__(self, product: Product, quantity: int):
+        self.product = product
+        self.quantity = quantity
+
+    def total_price(self) -> float:
+        return self.product.price * self.quantity
+Установка и запуск
+Требования
+Python 3.10+
+
+Poetry
+
+Установка зависимостей
+
 poetry install
 Запуск демонстрационного скрипта
 
@@ -83,18 +121,20 @@ poetry run python main.py
 Запуск всех тестов
 
 poetry run pytest -v
+Результаты тестирования
+Всего тестов: 41
+
+Все тесты успешны ✅
+
+Покрытие кода: 100%
+
 Проверка покрытия
 
 poetry run pytest --cov=src --cov-report=term
 Генерация HTML отчёта о покрытии
-
+bash
 poetry run pytest --cov=src --cov-report=html
 Отчёт сохраняется в папку htmlcov/.
-
-Результаты тестирования
-Всего тестов: 31
-
-Покрытие кода: 100%
 
 Линтеры и форматирование
 Форматирование кода (Black)
@@ -115,71 +155,49 @@ poetry run black --check src/ tests/ && \
 poetry run isort --check-only src/ tests/ && \
 poetry run flake8 src/ tests/ && \
 poetry run mypy src/
-Загрузка из JSON
-Поддерживается загрузка категорий и товаров из файла products.json:
-
-
-from src.json_loader import load_categories_from_json
-
-categories = load_categories_from_json("products.json")
-Пример использования
-
-from src.product import Product, Smartphone, LawnGrass
-from src.category import Category
-
-# Создание смартфона
-phone = Smartphone(
-    "iPhone 15", "512GB, Gray space", 210000.0, 8,
-    98.2, "15", 512, "Gray space"
-)
-
-# Создание травы
-grass = LawnGrass(
-    "Газонная трава", "Элитная трава", 500.0, 20,
-    "Россия", "7 дней", "Зеленый"
-)
-
-# Создание категории
-category = Category("Смартфоны", "Высокотехнологичные смартфоны", [phone])
-
-# Сложение (только одинаковые типы)
-total = phone + phone  # Работает
-# phone + grass  # TypeError!
-
-# Добавление продукта в категорию
-category.add_product(phone)  # Работает
-# category.add_product("not a product")  # TypeError!
-
-# Итерация по товарам
-for product in ProductIterator(category):
-    print(product)
 Структура проекта
 
 Project14_1/
 ├── src/
-│   ├── __init__.py
-│   ├── product.py           # Product, Smartphone, LawnGrass
-│   ├── category.py          # Category
-│   ├── json_loader.py       # Загрузка из JSON
-│   └── product_iterator.py  # Итератор для товаров
+│   ├── __init__.py           # Экспорт модулей
+│   ├── base_product.py       # Абстрактный класс BaseProduct
+│   ├── product.py            # Product, Smartphone, LawnGrass
+│   ├── category.py           # Category
+│   ├── mixin.py              # PrintInitMixin
+│   ├── order.py              # Order, BaseOrder
+│   ├── json_loader.py        # Загрузка из JSON
+│   └── product_iterator.py   # Итератор для товаров
 ├── tests/
 │   ├── __init__.py
+│   ├── test_base_product.py
 │   ├── test_product.py
 │   ├── test_category.py
+│   ├── test_category_magic.py
 │   ├── test_smartphone.py
 │   ├── test_lawn_grass.py
 │   ├── test_product_magic.py
 │   ├── test_json_loader.py
-│   └── test_product_iterator.py
-├── main.py                  # Демонстрационный скрипт
-├── products.json            # Данные для загрузки
-├── htmlcov/                 # HTML отчёт о покрытии
-├── pyproject.toml           # Зависимости Poetry
-├── .flake8                  # Конфиг Flake8
+│   ├── test_product_iterator.py
+│   ├── test_mixin.py
+│   └── test_order.py
+├── main.py                    # Демонстрационный скрипт
+├── products.json              # Данные для загрузки
+├── htmlcov/                   # HTML отчёт о покрытии
+├── pyproject.toml             # Зависимости Poetry
+├── .flake8                    # Конфиг Flake8
 ├── .gitignore
 └── README.md
-Автор
+Новое в этой версии
+Версия	Что добавлено
+1.0	Базовые классы Product и Category
+2.0	Магические методы __str__, __add__
+2.1	Классы-наследники Smartphone и LawnGrass
+3.0	Абстрактный класс BaseProduct
+3.0	Миксин PrintInitMixin
+3.0	Класс Order (доп. задание)
+```
+
+
+## Автор
 Владимир
 
-Статус проекта
-✅ Проект завершён. Все тесты проходят. Покрытие кода 100%.
