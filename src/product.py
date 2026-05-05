@@ -1,48 +1,78 @@
-class Product:
+from src.base_product import BaseProduct
+from src.mixin import PrintInitMixin
+
+
+class Product(PrintInitMixin, BaseProduct):
     """Класс для представления продукта"""
 
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+    def __init__(self, name: str, description: str, price: float, quantity: int, **kwargs):
         self.name = name
         self.description = description
-        self.__price = price  # ← ИСПРАВЛЕНО: два подчёркивания
+        self.price = price
         self.quantity = quantity
+        super().__init__(name, description, price, quantity, **kwargs)
 
-    @property
-    def price(self) -> float:
-        """Геттер для цены"""
-        return self.__price  # ← ИСПРАВЛЕНО: обращение к __price
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
-    @price.setter
-    def price(self, value: float) -> None:
-        """Сеттер для цены с проверкой"""
-        if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-        elif value < self.__price:  # ← ИСПРАВЛЕНО: обращение к __price
-            # Дополнительное задание: подтверждение при понижении цены
-            answer = input(f"Цена понижается с {self.__price} до {value}. Подтвердите (y/n): ")
-            if answer.lower() == "y":
-                self.__price = value  # ← ИСПРАВЛЕНО
-            else:
-                print("Изменение цены отменено")
-        else:
-            self.__price = value  # ← ИСПРАВЛЕНО
+    def __add__(self, other: BaseProduct) -> float:
+        if type(self) is not type(other):
+            raise TypeError(f"Нельзя складывать {type(self).__name__} и {type(other).__name__}")
+        return self.price * self.quantity + other.price * other.quantity  # type: ignore[attr-defined]
 
-    @classmethod
-    def new_product(cls, product_dict: dict, existing_products: list = None) -> "Product":
-        """Класс-метод для создания продукта из словаря с проверкой дубликатов"""
-        name = product_dict["name"]
-        description = product_dict["description"]
-        price = product_dict["price"]
-        quantity = product_dict["quantity"]
 
-        if existing_products is not None:
-            for existing in existing_products:
-                if existing.name == name:
-                    # Суммируем количество
-                    existing.quantity += quantity
-                    # Выбираем максимальную цену (используем геттер и сеттер)
-                    if price > existing.price:
-                        existing.price = price
-                    return existing
+class Smartphone(Product):
+    """Класс для представления смартфона"""
 
-        return cls(name, description, price, quantity)
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: float,
+        model: str,
+        memory: int,
+        color: str,
+    ):
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+        super().__init__(
+            name=name,
+            description=description,
+            price=price,
+            quantity=quantity,
+            efficiency=efficiency,
+            model=model,
+            memory=memory,
+            color=color,
+        )
+
+
+class LawnGrass(Product):
+    """Класс для представления газонной травы"""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ):
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+        super().__init__(
+            name=name,
+            description=description,
+            price=price,
+            quantity=quantity,
+            country=country,
+            germination_period=germination_period,
+            color=color,
+        )
