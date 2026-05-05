@@ -14,10 +14,20 @@ class TestPrintInitMixin:
         """Тест вывода информации при создании Smartphone"""
         Smartphone("iPhone", "Смартфон", 100000.0, 5, 95.5, "15 Pro", 256, "Black")
         captured = capsys.readouterr()
-        assert "Smartphone('iPhone', 'Смартфон', 100000.0, 5, 95.5, '15 Pro', 256, 'Black')" in captured.out
+        # Проверяем именованный формат вывода миксина
+        expected = (
+            "Smartphone('iPhone', 'Смартфон', 100000.0, 5, "
+            "efficiency=95.5, model='15 Pro', memory=256, color='Black')"
+        )
+        assert expected in captured.out
 
     def test_lawn_grass_print_init(self, capsys):
         """Тест вывода информации при создании LawnGrass"""
         LawnGrass("Трава", "Газонная", 500.0, 20, "Россия", "7 дней", "Зеленый")
         captured = capsys.readouterr()
-        assert "LawnGrass('Трава', 'Газонная', 500.0, 20, 'Россия', '7 дней', 'Зеленый')" in captured.out
+        # Проверяем именованный формат вывода миксина
+        expected = (
+            "LawnGrass('Трава', 'Газонная', 500.0, 20, "
+            "country='Россия', germination_period='7 дней', color='Зеленый')"
+        )
+        assert expected in captured.out
