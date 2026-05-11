@@ -29,7 +29,15 @@ class Category:
         """Добавление продукта в категорию с проверкой типа"""
         if not isinstance(product, Product):
             raise TypeError(
-                f"Можно добавлять только объекты Product или его наследников. Получен: {type(product).__name__}"
+                f"Можно добавлять только объекты Product или его наследников. " f"Получен: {type(product).__name__}"
             )
         self.__products.append(product)
         Category.product_count += 1
+
+    def middle_price(self) -> float:
+        """Возвращает среднюю цену всех товаров в категории"""
+        if not self.__products:
+            return 0.0
+
+        total_price = sum(product.price for product in self.__products)
+        return total_price / len(self.__products)

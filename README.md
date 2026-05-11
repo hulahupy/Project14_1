@@ -11,6 +11,8 @@
 - [Абстрактный класс BaseProduct](#абстрактный-класс-baseproduct)
 - [Миксин PrintInitMixin](#миксин-printinitmixin)
 - [Класс Order (дополнительное задание)](#класс-order-дополнительное-задание)
+- [Валидация количества товара](#валидация-количества-товара)
+- [Средняя цена категории](#средняя-цена-категории)
 - [Установка и запуск](#установка-и-запуск)
 - [Тестирование](#тестирование)
 - [Линтеры и форматирование](#линтеры-и-форматирование)
@@ -25,6 +27,10 @@
 - `description` - описание
 - `price` - цена
 - `quantity` - количество на складе
+
+**Валидация:**
+- При создании товара с `quantity <= 0` выбрасывается `ValueError` с сообщением  
+  «Товар с нулевым количеством не может быть добавлен»
 
 **Магические методы:**
 - `__str__` - строковое представление: `"Название, X руб. Остаток: X шт."`
@@ -54,6 +60,7 @@
 
 **Методы:**
 - `add_product()` - добавление товара в категорию (с проверкой типа)
+- `middle_price()` - возвращает среднюю цену всех товаров в категории (для пустой категории возвращает 0)
 - `__str__` - строковое представление: `"Название, количество продуктов: X шт."`
 
 ### ProductIterator
@@ -65,7 +72,7 @@
 
 Базовый абстрактный класс для всех продуктов. Определяет обязательные методы:
 
-```
+
 class BaseProduct(ABC):
     @abstractmethod
     def __str__(self) -> str: ...
@@ -79,24 +86,17 @@ class BaseProduct(ABC):
 
 
 class PrintInitMixin:
-    @staticmethod
-    def print_init_info(instance, *args, **kwargs):
-        """Печать информации о создании объекта"""
+    def __init__(self, *args, **kwargs):
+        """Автоматический вывод информации о создании объекта"""
 Пример вывода:
 
 
 Product('Телефон', 'Смартфон', 50000.0, 10)
-Smartphone('iPhone', 'Смартфон', 100000.0, 5, 95.5, '15 Pro', 256, 'Black')
-LawnGrass('Трава', 'Газонная', 500.0, 20, 'Россия', '7 дней', 'Зеленый')
+Smartphone('iPhone', 'Смартфон', 100000.0, 5, efficiency=95.5, model='15 Pro', memory=256, color='Black')
+LawnGrass('Трава', 'Газонная', 500.0, 20, country='Россия', germination_period='7 дней', color='Зеленый')
 Класс Order (дополнительное задание)
 Представляет заказ на один товар.
 
-Базовый абстрактный класс BaseOrder
-
-class BaseOrder(ABC):
-    @abstractmethod
-    def total_price(self) -> float: ...
-Класс Order
 
 class Order(BaseOrder):
     def __init__(self, product: Product, quantity: int):
@@ -105,6 +105,23 @@ class Order(BaseOrder):
 
     def total_price(self) -> float:
         return self.product.price * self.quantity
+Валидация количества товара
+При создании продукта с quantity <= 0 выбрасывается исключение:
+
+
+try:
+    product = Product("Бракованный товар", "Описание", 1000.0, 0)
+except ValueError as e:
+    print(e)  # "Товар с нулевым количеством не может быть добавлен"
+Средняя цена категории
+Метод middle_price() в классе Category возвращает среднюю цену всех товаров:
+
+
+category = Category("Смартфоны", "Описание", [product1, product2, product3])
+average = category.middle_price()  # (price1 + price2 + price3) / 3
+
+empty_category = Category("Пустая", "Описание", [])
+average_empty = empty_category.middle_price()  # 0.0
 Установка и запуск
 Требования
 Python 3.10+
@@ -122,7 +139,7 @@ poetry run python main.py
 
 poetry run pytest -v
 Результаты тестирования
-Всего тестов: 41
+Всего тестов: 51
 
 Все тесты успешны ✅
 
@@ -132,7 +149,7 @@ poetry run pytest -v
 
 poetry run pytest --cov=src --cov-report=term
 Генерация HTML отчёта о покрытии
-bash
+
 poetry run pytest --cov=src --cov-report=html
 Отчёт сохраняется в папку htmlcov/.
 
@@ -162,7 +179,7 @@ Project14_1/
 │   ├── __init__.py           # Экспорт модулей
 │   ├── base_product.py       # Абстрактный класс BaseProduct
 │   ├── product.py            # Product, Smartphone, LawnGrass
-│   ├── category.py           # Category
+│   ├── category.py           # Category (с middle_price)
 │   ├── mixin.py              # PrintInitMixin
 │   ├── order.py              # Order, BaseOrder
 │   ├── json_loader.py        # Загрузка из JSON
@@ -171,11 +188,13 @@ Project14_1/
 │   ├── __init__.py
 │   ├── test_base_product.py
 │   ├── test_product.py
+│   ├── test_product_exceptions.py    # Тесты валидации
+│   ├── test_product_magic.py
 │   ├── test_category.py
 │   ├── test_category_magic.py
+│   ├── test_category_middle_price.py # Тесты middle_price
 │   ├── test_smartphone.py
 │   ├── test_lawn_grass.py
-│   ├── test_product_magic.py
 │   ├── test_json_loader.py
 │   ├── test_product_iterator.py
 │   ├── test_mixin.py
@@ -187,17 +206,14 @@ Project14_1/
 ├── .flake8                    # Конфиг Flake8
 ├── .gitignore
 └── README.md
-Новое в этой версии
+
+История версий
 Версия	Что добавлено
 1.0	Базовые классы Product и Category
 2.0	Магические методы __str__, __add__
 2.1	Классы-наследники Smartphone и LawnGrass
-3.0	Абстрактный класс BaseProduct
-3.0	Миксин PrintInitMixin
-3.0	Класс Order (доп. задание)
-```
-
+3.0	Абстрактный класс BaseProduct, миксин PrintInitMixin, класс Order
+4.0	Валидация quantity в Product, метод middle_price в Category
 
 ## Автор
 Владимир
-
